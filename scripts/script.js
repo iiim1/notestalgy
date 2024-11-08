@@ -4,8 +4,7 @@ function showAlert(type, headText, bodyText) {
     const header = toast.querySelector(".text-1");
     const message = toast.querySelector(".text-2");
     const progress = toast.querySelector(".progress");
-
-    // Tampilkan toast-wrapper
+    
     toastWrapper.style.display = "block";
 
     if (type === "sukses") {
@@ -129,8 +128,6 @@ document.addEventListener('DOMContentLoaded', function () {
             reader.readAsDataURL(file);
         }
     });
-
-    // Update file input trigger text
     if (image) image.addEventListener('change', function (e) {
         const fileName = e.target.files[0]?.name;
         if (fileName) {
