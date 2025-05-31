@@ -1,0 +1,727 @@
+// ==================== PENJELASAN UNTUK PEMULA TOTAL ====================
+
+// APA ITU CLASS? 
+// Class itu seperti CETAKAN atau BLUEPRINT untuk membuat sesuatu
+// Misalnya: cetakan kue, dari 1 cetakan bisa buat banyak kue
+
+// CLASS PERTAMA: TRANSAKSI
+class Transaksi {
+   // INI DISEBUT ATRIBUT/VARIABEL - seperti kotak penyimpanan data
+   // PRIVATE artinya: cuma class ini yang boleh akses langsung, orang lain TIDAK BOLEH
+   private String item;      // Kotak untuk nyimpan nama barang (String = teks)
+   private int harga;        // Kotak untuk nyimpan angka harga (int = angka bulat)
+   private int jumlah;       // Kotak untuk nyimpan berapa banyak barang
+   private int pembayaran;   // Kotak untuk nyimpan berapa uang yang dibayar
+   private int kembalian;    // Kotak untuk nyimpan berapa kembalian
+
+   // INI CONSTRUCTOR - seperti tukang yang ngisi kotak-kotak tadi saat pertama kali dibuat
+   // Setiap kali bikin objek baru, constructor ini yang jalan duluan
+   public Transaksi(String var1, int var2, int var3, int var4, int var5) {
+      this.item = var1;        // Masukin nama barang ke kotak item
+      this.harga = var2;       // Masukin harga ke kotak harga  
+      this.jumlah = var3;      // Masukin jumlah ke kotak jumlah
+      this.pembayaran = var4;  // Masukin pembayaran ke kotak pembayaran
+      this.kembalian = var5;   // Masukin kembalian ke kotak kembalian
+   }
+   // "this" artinya kotak milik objek yang sedang dibuat sekarang
+
+   // INI GETTER METHOD - seperti jendela kecil untuk ngintip isi kotak
+   // Karena kotak-kotaknya PRIVATE, butuh jendela khusus untuk liat isinya
+   public String getItem() {
+      return this.item;  // Kasih tau isi kotak item
+   }
+
+   public int getHarga() {
+      return this.harga; // Kasih tau isi kotak harga
+   }
+
+   public int getJumlah() {
+      return this.jumlah; // Kasih tau isi kotak jumlah
+   }
+
+   public int getPembayaran() {
+      return this.pembayaran; // Kasih tau isi kotak pembayaran
+   }
+
+   public int getKembalian() {
+      return this.kembalian; // Kasih tau isi kotak kembalian
+   }
+
+   // INI METHOD BIASA - seperti kemampuan/aksi yang bisa dilakukan objek
+   public void printStruk() {
+      // System.out.println = perintah untuk ngeprint/nampillin ke layar
+      System.out.println("Item: " + this.getItem());              // Print nama barang
+      System.out.println("Harga: Rp" + this.getHarga());         // Print harga + "Rp"
+      System.out.println("Jumlah: " + this.getJumlah());         // Print jumlah barang
+      System.out.println("Pembayaran: Rp" + this.getPembayaran()); // Print uang yang dibayar
+      System.out.println("Kembalian: Rp" + this.getKembalian()); // Print kembalian
+   }
+   // Kenapa pake getItem() bukan langsung this.item? Karena kebiasaan baik dalam OOP
+}
+
+// ==================== CLASS KEDUA: STRUKBELANJA ====================
+
+// IMPORT = ambil class dari tempat lain (dari folder model)
+import model.Transaksi;
+
+// EXTENDS = PEWARISAN/INHERITANCE 
+// Artinya: StrukBelanja adalah ANAK dari Transaksi
+// Anak otomatis punya semua yang dimiliki orangtua
+class StrukBelanja extends Transaksi {
+   
+   // Constructor anak harus manggil constructor orangtua dulu
+   public StrukBelanja(String var1, int var2, int var3, int var4, int var5) {
+      // SUPER = panggil constructor orangtua (Transaksi)
+      super(var1, var2, var3, var4, var5);
+   }
+   // Class ini cuma "pembungkus", gak nambah fitur baru
+   // Tapi karena pewarisan, dia tetap punya semua kemampuan Transaksi
+}
+
+// ==================== FUNGSI-FUNGSI DI APP.JAVA ====================
+
+// METHOD UNTUK AMBIL DATA DARI DATABASE
+// PRIVATE = cuma bisa dipanggil dari dalam class App ini
+// STATIC = bisa dipanggil tanpa bikin objek App dulu
+// List<StrukBelanja> = return tipe berupa daftar objek StrukBelanja
+private static List<StrukBelanja> ambilRiwayatPembelianDariDatabase() {
+   
+   // ARRAYLIST = seperti keranjang yang bisa nampung banyak objek
+   ArrayList var0 = new ArrayList(); // Bikin keranjang kosong
+   
+   // STRING QUERY SQL = perintah untuk database dalam bahasa SQL
+   String var1 = "SELECT item, harga, jumlah, pembayaran, kembalian, username FROM strukbelanja";
+   // Artinya: "Ambil kolom item, harga, jumlah, pembayaran, kembalian, username dari tabel strukbelanja"
+
+   try { // TRY = coba jalankan kode ini, kalau error langsung loncat ke CATCH
+      
+      // KONEKSI KE DATABASE - seperti sambungin kabel ke database
+      Connection var2 = DatabaseConnection.getConnection();
+
+      try {
+         // PREPARED STATEMENT = cara aman untuk jalanin query SQL
+         PreparedStatement var3 = var2.prepareStatement(var1);
+
+         try {
+            // EXECUTE QUERY = jalanin perintah SQL dan simpan hasilnya
+            ResultSet var4 = var3.executeQuery();
+            // ResultSet = seperti tabel hasil dari database
+
+            try {
+               // WHILE LOOP = selama masih ada baris data, terus ulang
+               while(var4.next()) { // next() = pindah ke baris berikutnya
+                  
+                  // AMBIL DATA dari setiap kolom di baris saat ini
+                  String var5 = var4.getString("item");         // Ambil isi kolom "item"
+                  int var6 = var4.getInt("harga");             // Ambil isi kolom "harga"  
+                  int var7 = var4.getInt("jumlah");            // Ambil isi kolom "jumlah"
+                  int var8 = var4.getInt("pembayaran");        // Ambil isi kolom "pembayaran"
+                  int var9 = var4.getInt("kembalian");         // Ambil isi kolom "kembalian"
+                  
+                  // BIKIN OBJEK BARU dari data yang diambil
+                  StrukBelanja var10 = new StrukBelanja(var5, var6, var7, var8, var9);
+                  
+                  // MASUKIN objek ke dalam keranjang
+                  var0.add(var10);
+               }
+            } catch (Throwable var14) {
+               // EXCEPTION HANDLING - kalau ada error, tutup ResultSet
+               if (var4 != null) {
+                  try {
+                     var4.close(); // Tutup ResultSet supaya gak bocor memori
+                  } catch (Throwable var13) {
+                     var14.addSuppressed(var13); // Gabungin error
+                  }
+               }
+               throw var14; // Lempar error ke atas
+            }
+
+            // Tutup ResultSet kalau berhasil
+            if (var4 != null) {
+               var4.close();
+            }
+         } catch (Throwable var15) {
+            // Tutup PreparedStatement kalau ada error
+            if (var3 != null) {
+               try {
+                  var3.close();
+               } catch (Throwable var12) {
+                  var15.addSuppressed(var12);
+               }
+            }
+            throw var15;
+         }
+
+         // Tutup PreparedStatement kalau berhasil
+         if (var3 != null) {
+            var3.close();
+         }
+      } catch (Throwable var16) {
+         // Tutup Connection kalau ada error
+         if (var2 != null) {
+            try {
+               var2.close();
+            } catch (Throwable var11) {
+               var16.addSuppressed(var11);
+            }
+         }
+         throw var16;
+      }
+
+      // Tutup Connection kalau berhasil
+      if (var2 != null) {
+         var2.close();
+      }
+   } catch (SQLException var17) {
+      // SQLEXCEPTION = error khusus database
+      var17.printStackTrace(); // Print detail error untuk programmer
+      System.out.println("Terjadi Kesalahan"); // Print pesan sederhana untuk user
+   }
+
+   // RETURN = kasih balik keranjang berisi objek-objek StrukBelanja
+   return var0;
+}
+
+// METHOD UNTUK NAMPILLIN RIWAYAT PEMBELIAN
+private static void lihatRiwayatPembelian() {
+   
+   // PANGGIL method di atas untuk dapet data dari database
+   List var0 = ambilRiwayatPembelianDariDatabase();
+   
+   // CEK apakah keranjang kosong atau ada isinya
+   if (var0.isEmpty()) { // isEmpty() = true kalau kosong
+      System.out.println("Belum ada riwayat pembelian.");
+   } else {
+      // PRINT HEADER yang cantik pake simbol kotak dan warna
+      // \u001b[95m = kode warna ungu, \u001b[0m = reset warna
+      System.out.println("\n\u001b[95m╔══════════════════════════════════════════╗");
+      System.out.println("║             RIWAYAT PEMBELIAN             ║");
+      System.out.println("╚═══════════════════════════════════════════╝\u001b[0m");
+      
+      // ITERATOR = alat untuk jalan-jalan dalam keranjang satu per satu
+      Iterator var1 = var0.iterator();
+
+      // WHILE LOOP = selama masih ada objek, terus ulang
+      while(var1.hasNext()) { // hasNext() = masih ada objek berikutnya?
+         
+         // AMBIL objek berikutnya dan ubah jadi StrukBelanja
+         StrukBelanja var2 = (StrukBelanja)var1.next();
+         // (StrukBelanja) = CASTING, paksa objek jadi tipe StrukBelanja
+         
+         // PRINT detail setiap transaksi pake getter method
+         System.out.println("Item: " + var2.getItem());
+         System.out.println("Total Harga: Rp" + var2.getHarga());
+         System.out.println("Jumlah: " + var2.getJumlah());
+         System.out.println("Pembayaran: Rp" + var2.getPembayaran());
+         System.out.println("Kembalian: Rp" + var2.getKembalian());
+         System.out.println("═══════════════════════════════════"); // Garis pemisah
+      }
+
+      // Print garis penutup
+      System.out.println("═══════════════════════════════════════");
+   }
+}
+
+// ==================== KESIMPULAN SEDERHANA ====================
+/*
+KONSEP OOP YANG DIPAKAI:
+
+1. CLASS = Cetakan/blueprint untuk bikin objek
+2. OBJECT = Barang jadi hasil dari cetakan class  
+3. ENCAPSULATION = Sembunyiin data pake private, akses pake getter
+4. INHERITANCE = Anak class warisi semua milik orangtua class
+5. METHOD = Kemampuan/aksi yang bisa dilakukan objek
+
+ALUR PROGRAM:
+1. Ambil data dari database → jadi ResultSet
+2. Loop setiap baris ResultSet → bikin objek StrukBelanja
+3. Masukin semua objek ke ArrayList
+4. Loop ArrayList → print detail setiap objek
+
+KENAPA PAKE OOP?
+- Kode lebih rapi dan terorganisir
+- Bisa dipakai ulang (reusable)
+- Data lebih aman (encapsulation)  
+- Mudah dikembangkan (inheritance)
+*/
+
+// ==================== FUNGSI BELI MIE INSTAN ====================
+// Ini fungsi utama untuk proses pembelian mie instan di warung
+
+private static void beliMieInstan() {
+   try { // TRY = coba jalankan kode ini, kalau error loncat ke CATCH
+      
+      // AMBIL SEMUA DATA MIE INSTAN dari database ke dalam List
+      List var0 = ambilDataMieInstanDariDatabase();
+      
+      // TAMPILKAN semua mie instan yang tersedia ke layar
+      lihatSemuaMieInstan();
+      
+      // CEK apakah ada data mie instan atau tidak
+      if (var0.isEmpty()) { // isEmpty() = true kalau kosong
+         System.out.println("Data mie instan di Warmindo masih kosong");
+         return; // KELUAR dari fungsi kalau gak ada data
+      }
+
+      // MINTA INPUT dari customer: mie apa yang mau dibeli?
+      System.out.print("Masukkan nama mie instan yang ingin dibeli: ");
+      String var1 = scanner.nextLine(); // Baca input dari keyboard
+      
+      // BIKIN VARIABEL untuk nyimpan mie yang dipilih customer
+      MieInstan var2 = null; // null = kosong/belum ada
+      
+      // BIKIN ITERATOR untuk jalan-jalan di List mie instan
+      Iterator var3 = var0.iterator();
+
+      // LOOP: cari mie yang namanya sama dengan input customer
+      while(var3.hasNext()) { // Selama masih ada mie di list
+         MieInstan var4 = (MieInstan)var3.next(); // Ambil mie berikutnya
+         
+         // CEK: apakah nama mie sama dengan yang customer mau?
+         // equalsIgnoreCase = bandingin teks tanpa peduli huruf besar/kecil
+         if (var4.getNama().equalsIgnoreCase(var1)) {
+            var2 = var4; // KETEMU! Simpan mie ini
+            break; // KELUAR dari loop karena udah ketemu
+         }
+      }
+
+      // CEK: apakah mie yang dicari ketemu atau tidak?
+      if (var2 == null) { // null = gak ketemu
+         System.out.println("Mie instan tidak ditemukan!");
+         return; // KELUAR dari fungsi
+      }
+
+      // MINTA INPUT: berapa banyak yang mau dibeli?
+      System.out.print("Masukkan jumlah stok yang ingin dibeli: ");
+      int var33 = inputAngka(); // inputAngka() = fungsi khusus baca angka
+      
+      // VALIDASI: pastikan jumlah yang diinput valid
+      if (var33 <= 0) { // Kalau 0 atau negatif = gak valid
+         System.out.println("Jumlah stok yang dimasukkan tidak valid!");
+         return; // KELUAR dari fungsi
+      }
+
+      // CEK: apakah stok mencukupi?
+      if (var33 > var2.getStok()) { // Kalau minta lebih dari stok yang ada
+         System.out.println("Stok tidak mencukupi!");
+         return; // KELUAR dari fungsi
+      }
+
+      // HITUNG TOTAL HARGA = harga per item × jumlah yang dibeli
+      int var34 = var2.getHarga() * var33;
+      
+      // BIKIN KERANJANG BELANJA untuk nyimpan daftar barang yang dibeli
+      ArrayList var5 = new ArrayList();
+      // MASUKIN item pertama (mie instan) ke keranjang
+      var5.add("" + var33 + "x " + var2.getNama() + " - Rp" + var34);
+      
+      // TANYA: mau tambah minuman gak?
+      System.out.println("Ingin menambah minuman? (y/n)");
+      String var6 = scanner.nextLine(); // Baca jawaban customer
+      
+      int var7 = 0; // Total harga minuman
+      int var8 = 0; // Jumlah jenis minuman yang dibeli
+
+      int var9; // Variabel untuk harga minuman sementara
+      
+      // LOOP: selama customer masih mau tambah minuman
+      while(var6.equalsIgnoreCase("y")) { // "y" = yes/iya
+         
+         // PANGGIL FUNGSI beliMinuman, return harga minuman yang dibeli
+         var9 = beliMinuman(var5); // var5 = keranjang, biar minuman masuk ke keranjang
+         
+         var7 += var9; // TAMBAHKAN harga minuman ke total harga minuman
+         
+         // TAMPILKAN total harga sementara (mie + minuman)
+         System.out.println("Total harga sementara: Rp" + (var34 + var7));
+         
+         // TANYA LAGI: mau tambah minuman lagi?
+         System.out.println("Ingin menambah minuman lagi? (y/n)");
+         var6 = scanner.nextLine();
+         
+         // KALAU berhasil beli minuman (harga > 0), tambah counter jenis minuman
+         if (var9 > 0) {
+            ++var8; // sama dengan var8 = var8 + 1
+         }
+      }
+
+      // HITUNG TOTAL AKHIR = harga mie + harga semua minuman
+      var9 = var34 + var7;
+      System.out.println("Total harga: Rp" + var9);
+      
+      int var10 = 0; // Variabel untuk jumlah pembayaran
+
+      // LOOP PEMBAYARAN: terus minta bayar sampai uangnya cukup
+      while(var10 < var9) { // Selama pembayaran masih kurang
+         System.out.print("Masukkan jumlah pembayaran: ");
+         var10 = inputAngka(); // Baca jumlah uang yang dibayar
+         
+         // KALAU uang kurang, kasih peringatan
+         if (var10 < var9) {
+            System.out.println("Pembayaran gagal! Uang yang diberikan kurang.");
+            System.out.println("Total harga: Rp" + var9);
+         }
+      }
+
+      // HITUNG KEMBALIAN = uang yang dibayar - total harga
+      int var11 = var10 - var9;
+      System.out.println("Pembayaran berhasil!");
+      System.out.println("Kembalian: Rp" + var11);
+      
+      // BAGIAN DATABASE: update stok mie instan di database
+      Connection var12 = null; // Variabel koneksi database
+
+      try {
+         // BUKA KONEKSI ke database
+         var12 = DatabaseConnection.getConnection();
+         
+         // QUERY SQL untuk update stok mie instan
+         String var13 = "UPDATE mie_instan SET stok = ? WHERE nama = ?";
+         // Artinya: "Update tabel mie_instan, set kolom stok = nilai baru, where nama = nama mie"
+         
+         PreparedStatement var14 = var12.prepareStatement(var13);
+
+         try {
+            // ISI PARAMETER di query SQL
+            var14.setInt(1, var2.getStok() - var33); // Parameter 1: stok baru = stok lama - yang dibeli
+            var14.setString(2, var2.getNama()); // Parameter 2: nama mie
+            
+            // JALANKAN QUERY UPDATE
+            var14.executeUpdate();
+         } catch (Throwable var29) {
+            // TUTUP PreparedStatement kalau ada error
+            if (var14 != null) {
+               try {
+                  var14.close();
+               } catch (Throwable var28) {
+                  var29.addSuppressed(var28);
+               }
+            }
+            throw var29;
+         }
+
+         // TUTUP PreparedStatement kalau berhasil
+         if (var14 != null) {
+            var14.close();
+         }
+
+         // UPDATE STOK di objek mie instan juga (biar sinkron)
+         var2.setStok(var2.getStok() - var33);
+         
+      } catch (SQLException var30) {
+         // KALAU ada error database, print error
+         var30.printStackTrace();
+         System.out.println("Error while updating stock in the database.");
+      } finally {
+         // FINALLY = kode yang PASTI dijalankan, error atau gak error
+         try {
+            // TUTUP KONEKSI database
+            if (var12 != null) {
+               var12.close();
+            }
+         } catch (SQLException var27) {
+            var27.printStackTrace();
+         }
+      }
+
+      // CETAK STRUK pembelian ke layar
+      cetakStruk(var5, var9, var10, var11);
+      
+      // SIMPAN DATA pembelian ke database (untuk riwayat)
+      simpanStrukBelanja(var5, var9, var33, var8, var10, var11);
+      
+      // TAMPILKAN PESAN TERIMA KASIH
+      System.out.println("╔═════════════════════════════════════╗");
+      System.out.println("║       TERIMA KASIH TELAH BELANJA    ║");
+      System.out.println("║          DI WARUNG MIE KAMI         ║");
+      System.out.println("╚═════════════════════════════════════╝");
+      
+   } catch (SQLException var32) {
+      // KALAU ada error SQL di level fungsi utama
+      var32.printStackTrace();
+      System.out.println("Error while buying Mie Instan.");
+   }
+}
+
+// ==================== FUNGSI BELI MINUMAN ====================
+// Fungsi khusus untuk beli minuman (dipanggil dari beliMieInstan)
+// ArrayList<String> var0 = keranjang belanja yang dioper dari fungsi utama
+
+private static int beliMinuman(ArrayList<String> var0) throws SQLException {
+   // AMBIL DATA semua minuman dari database
+   List var1 = ambilDataMinumanDariDatabase();
+   
+   // CEK apakah ada data minuman
+   if (var1.isEmpty()) {
+      System.out.println("Data minuman di Warmindo masih kosong");
+      return 0; // RETURN 0 = gak ada minuman yang dibeli, harga = 0
+   } else {
+      // TAMPILKAN semua minuman yang tersedia
+      lihatMinuman();
+      
+      // MINTA INPUT: minuman apa yang mau dibeli?
+      System.out.print("Masukkan nama minuman yang ingin dibeli: ");
+      String var2 = scanner.nextLine();
+      
+      // BIKIN VARIABEL untuk nyimpan minuman yang dipilih
+      Minuman var3 = null;
+      Iterator var4 = var1.iterator();
+
+      // LOOP: cari minuman yang namanya sama dengan input customer
+      while(var4.hasNext()) {
+         Minuman var5 = (Minuman)var4.next();
+         if (var5.getNama().equalsIgnoreCase(var2)) {
+            var3 = var5; // KETEMU! Simpan minuman ini
+            break;
+         }
+      }
+
+      // CEK: minuman ketemu atau gak?
+      if (var3 == null) {
+         System.out.println("Minuman tidak ditemukan!");
+         return 0; // RETURN 0 = gak beli apa-apa
+      } else {
+         // MINTA INPUT: berapa banyak yang mau dibeli?
+         System.out.print("Masukkan jumlah yang ingin dibeli: ");
+         int var25 = inputAngka();
+         
+         // VALIDASI jumlah
+         if (var25 <= 0) {
+            System.out.println("Jumlah yang dimasukkan tidak valid!");
+            return 0;
+         } else if (var25 > var3.getStok()) { // CEK stok
+            System.out.println("Stok tidak mencukupi!");
+            return 0;
+         } else {
+            // HITUNG HARGA minuman = harga per item × jumlah
+            int var26 = var3.getHarga() * var25;
+            Connection var6 = null;
+
+            int var8; // Variabel return value
+            try {
+               // BUKA KONEKSI database
+               var6 = DatabaseConnection.getConnection();
+               
+               // QUERY untuk update stok minuman
+               String var7 = "UPDATE minuman SET stok = ? WHERE nama = ?";
+               PreparedStatement var27 = var6.prepareStatement(var7);
+
+               try {
+                  // ISI PARAMETER query
+                  var27.setInt(1, var3.getStok() - var25); // Stok baru
+                  var27.setString(2, var3.getNama()); // Nama minuman
+                  
+                  // JALANKAN UPDATE
+                  var27.executeUpdate();
+               } catch (Throwable var22) {
+                  // Exception handling
+                  if (var27 != null) {
+                     try {
+                        var27.close();
+                     } catch (Throwable var21) {
+                        var22.addSuppressed(var21);
+                     }
+                  }
+                  throw var22;
+               }
+
+               // TUTUP PreparedStatement
+               if (var27 != null) {
+                  var27.close();
+               }
+
+               // UPDATE STOK di objek minuman
+               var3.setStok(var3.getStok() - var25);
+               
+               // TAMBAHKAN minuman ke keranjang belanja
+               var0.add("" + var25 + "x " + var3.getNama() + " - Rp" + var26);
+               
+               var8 = var26; // SET return value = harga minuman
+               return var8; // RETURN harga minuman
+               
+            } catch (SQLException var23) {
+               // KALAU ada error database
+               var23.printStackTrace();
+               System.out.println("Error while buying minuman.");
+               var8 = 0; // SET return value = 0 (gagal)
+            } finally {
+               // TUTUP KONEKSI database
+               try {
+                  if (var6 != null) {
+                     var6.close();
+                  }
+               } catch (SQLException var20) {
+                  var20.printStackTrace();
+               }
+            }
+            return var8; // RETURN hasil (0 kalau gagal)
+         }
+      }
+   }
+}
+
+// ==================== FUNGSI CETAK STRUK ====================
+// Fungsi untuk nampilkan struk pembelian ke layar
+
+private static void cetakStruk(ArrayList<String> var0, int var1, int var2, int var3) {
+   // var0 = keranjang belanja (daftar barang)
+   // var1 = total harga
+   // var2 = jumlah pembayaran  
+   // var3 = kembalian
+   
+   // PRINT HEADER struk dengan warna kuning (\u001b[33m)
+   System.out.println("\u001b[33m╔═════════════════════════════════════╗");
+   System.out.println("║             STRUK PEMBELIAN         ║");
+   System.out.println("╚═════════════════════════════════════╝\u001b[0m");
+   
+   // BIKIN ITERATOR untuk jalan-jalan di keranjang belanja
+   Iterator var4 = var0.iterator();
+
+   // LOOP: print setiap barang yang dibeli
+   while(var4.hasNext()) {
+      String var5 = (String)var4.next(); // Ambil string barang berikutnya
+      System.out.println(var5); // Print detail barang
+   }
+
+   // PRINT DETAIL PEMBAYARAN
+   System.out.println("---------------------------------------");
+   System.out.println("Total Harga: Rp" + var1);
+   System.out.println("Pembayaran: Rp" + var2);
+   System.out.println("Kembalian: Rp" + var3);
+   
+   // PRINT PESAN PENUTUP dengan warna kuning
+   System.out.println("\u001b[33m╔═════════════════════════════════════╗");
+   System.out.println("║       TERIMA KASIH TELAH BELANJA    ║");
+   System.out.println("║          DI WARUNG MIE KAMI         ║");
+   System.out.println("╚═════════════════════════════════════╝\u001b[0m");
+}
+
+// ==================== FUNGSI SIMPAN STRUK KE DATABASE ====================
+// Fungsi untuk nyimpan data pembelian ke database (buat riwayat)
+
+private static void simpanStrukBelanja(ArrayList<String> var0, int var1, int var2, int var3, int var4, int var5) {
+   // var0 = keranjang belanja
+   // var1 = total harga
+   // var2 = jumlah mie instan
+   // var3 = jumlah jenis minuman
+   // var4 = jumlah pembayaran
+   // var5 = kembalian
+   
+   // QUERY SQL untuk insert data ke tabel strukbelanja
+   String var6 = "INSERT INTO strukbelanja (item, harga, jumlah, pembayaran, kembalian, username) VALUES (?, ?, ?, ?, ?, ?)";
+   // Artinya: "Masukin data baru ke tabel strukbelanja dengan kolom-kolom ini"
+
+   try {
+      // BUKA KONEKSI database
+      Connection var7 = DatabaseConnection.getConnection();
+
+      try {
+         // SIAPKAN PreparedStatement
+         PreparedStatement var8 = var7.prepareStatement(var6);
+
+         try {
+            // ISI SEMUA PARAMETER query
+            var8.setString(1, String.join(", ", var0)); // Parameter 1: gabungin semua item jadi 1 string
+            var8.setInt(2, var1); // Parameter 2: total harga
+            var8.setInt(3, var2 + var3); // Parameter 3: total jumlah item (mie + minuman)
+            var8.setInt(4, var4); // Parameter 4: jumlah pembayaran
+            var8.setInt(5, var5); // Parameter 5: kembalian
+            var8.setString(6, currentUser2.getUsername()); // Parameter 6: username yang lagi login
+            
+            // JALANKAN QUERY INSERT
+            var8.executeUpdate();
+            System.out.println("Struk pembelian berhasil disimpan ke dalam database.");
+            
+         } catch (Throwable var13) {
+            // Exception handling untuk PreparedStatement
+            if (var8 != null) {
+               try {
+                  var8.close();
+               } catch (Throwable var12) {
+                  var13.addSuppressed(var12);
+               }
+            }
+            throw var13;
+         }
+
+         // TUTUP PreparedStatement
+         if (var8 != null) {
+            var8.close();
+         }
+      } catch (Throwable var14) {
+         // Exception handling untuk Connection
+         if (var7 != null) {
+            try {
+               var7.close();
+            } catch (Throwable var11) {
+               var14.addSuppressed(var11);
+            }
+         }
+         throw var14;
+      }
+
+      // TUTUP Connection
+      if (var7 != null) {
+         var7.close();
+      }
+   } catch (SQLException var15) {
+      // KALAU ada error SQL
+      var15.printStackTrace();
+      System.out.println("Error while saving receipt to database.");
+   }
+}
+
+// ==================== KESIMPULAN FUNGSI-FUNGSI INI ====================
+/*
+ALUR LENGKAP PEMBELIAN MIE INSTAN:
+
+1. beliMieInstan() - FUNGSI UTAMA
+   - Tampilkan semua mie instan
+   - Customer pilih mie instan
+   - Customer input jumlah yang mau dibeli
+   - Cek stok mencukupi atau tidak
+   - Hitung harga mie instan
+   - Tanya mau tambah minuman atau tidak?
+
+2. beliMinuman() - FUNGSI TAMBAHAN (kalau customer mau minuman)
+   - Tampilkan semua minuman
+   - Customer pilih minuman
+   - Customer input jumlah minuman
+   - Cek stok minuman
+   - Update stok minuman di database
+   - Return harga minuman
+
+3. PEMBAYARAN (kembali ke beliMieInstan)
+   - Hitung total harga (mie + minuman)
+   - Customer bayar (loop sampai uang cukup)
+   - Hitung kembalian
+   - Update stok mie instan di database
+
+4. cetakStruk() - CETAK STRUK
+   - Tampilkan daftar barang yang dibeli
+   - Tampilkan total harga, pembayaran, kembalian
+
+5. simpanStrukBelanja() - SIMPAN KE DATABASE
+   - Simpan data pembelian ke tabel strukbelanja
+   - Buat riwayat pembelian customer
+
+KONSEP PROGRAMMING YANG DIPAKAI:
+- Exception Handling (try-catch-finally)
+- Database Transaction (UPDATE, INSERT)
+- Loop dan Conditional
+- ArrayList untuk keranjang belanja
+- Iterator untuk traversal data
+- Method dengan parameter dan return value
+- String manipulation (join, concatenation)
+
+KEAMANAN DATABASE:
+- Pake PreparedStatement (aman dari SQL Injection)
+- Proper connection handling (buka-tutup koneksi)
+- Transaction rollback kalau ada error
+
+FITUR USER EXPERIENCE:
+- Validasi input (cek angka valid, stok cukup)
+- Pesan error yang jelas
+- Struk yang rapi dengan ASCII art
+- Warna di terminal untuk tampilan menarik
+*/
